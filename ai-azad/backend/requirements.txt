@@ -1,0 +1,11 @@
+flask
+pymongo
+psycopg2-binary
+elasticsearch
+redis
+transformers
+torch
+datasets
+pillow
+pytesseract
+pytest
