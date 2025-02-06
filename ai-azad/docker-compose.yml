@@ -1,51 +1,87 @@
-version: '3.8'
+# docker-compose.yml
+
+
 
 services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    #environment:
+      #MONGO_INITDB_ROOT_USERNAME: root
+      #MONGO_INITDB_ROOT_PASSWORD: 26892899
+      #MONGO_INITDB_DATABASE: ai-tax-azad
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ai_tax_azad
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
   backend:
     build: ./backend
+    container_name: backend
     ports:
       - "5000:5000"
+    depends_on:
+      - mongo
+      - redis
+      - elasticsearch
+      - postgres
     environment:
       - FLASK_ENV=development
     volumes:
       - ./backend:/app
-    depends_on:
-      - mongo
-      - postgres
-      - elasticsearch
-      - redis
+    networks:
+      - app-network
 
   frontend:
     build: ./frontend
+    container_name: frontend
     ports:
       - "3000:3000"
     environment:
       - CHOKIDAR_USEPOLLING=true
-    volumes:
-      - ./frontend:/app
     depends_on:
       - backend
+    volumes:
+      - ./frontend:/app
+    networks:
+      - app-network
 
-  mongo:
-    image: mongo
-    ports:
-      - "27017:27017"
+networks:
+  app-network:
+    driver: bridge
 
-  postgres:
-    image: postgres
-    environment:
-      POSTGRES_DB: mydatabase
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-    ports:
-      - "5432:5432"
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
-    ports:
-      - "9200:9200"
-
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
+volumes:
+  mongo_data:
+  postgres_data:

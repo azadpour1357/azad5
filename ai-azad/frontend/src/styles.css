@@ -1,123 +1,61 @@
-/* styles.css */
-
-.search-container {
-    max-width: 600px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.search-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.search-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.search-button:hover {
-    background-color: #0056b3;
-}
-
-.result-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.result-item {
-    background-color: white;
-    margin: 10px 0;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.result-title {
-    margin: 0;
-    color: #333;
-}
-
-.result-content {
-    color: #666;
-}
-
-.result-classification {
-    color: #007bff;
-}
-
-.entity-list, .info-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.entity-item, .info-item {
-    margin: 5px 0;
-    color: #333;
-}
-
 /* frontend/src/styles.css */
 
-.add-document-container {
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.App {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.container {
     max-width: 600px;
-    margin: 20px auto;
+    margin: 0 auto;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.add-document-container h2 {
-    color: #333;
-    text-align: center;
-}
-
-.add-document-container .form-group {
+.form-group {
     margin-bottom: 15px;
 }
 
-.add-document-container label {
+label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
     color: #555;
 }
 
-.add-document-container input, .add-document-container textarea {
+input, textarea, button {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-.add-document-container button {
-    padding: 10px 20px;
+button {
     background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
-    display: block;
-    margin: 10px auto;
 }
 
-.add-document-container button:hover {
+button:hover {
     background-color: #0056b3;
 }
 
-.add-document-container .success {
+.success {
     color: green;
     text-align: center;
 }
 
-.add-document-container .error {
+.error {
     color: red;
     text-align: center;
 }

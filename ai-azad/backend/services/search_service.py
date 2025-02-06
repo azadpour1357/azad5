@@ -1,47 +1,35 @@
-from pymongo import MongoClient
-import psycopg2
-from elasticsearch import Elasticsearch
-import redis
-from utils.db_utils import connect_mongo, connect_postgres, connect_elasticsearch, connect_redis
-from models.bert_model import classify_text
+# backend/services/search_service.py
+
+from utils.db_utils import connect_mongo, connect_elasticsearch, connect_redis
+from models.roberta_model import classify_text
 
 def perform_search(query):
-    # MongoDB connection
+    # جستجو در MongoDB
     db = connect_mongo()
-    collection = db['documents']
-    
+    collection = db['tax']
     mongo_results = collection.find({"title": {"$regex": query, "$options": "i"}})
-    mongo_docs = [{"title": result["title"], "content": result["content"]} for result in mongo_results]
+    mongo_docs = [{"title": doc["title"], "content": doc["content"]} for doc in mongo_results]
 
-    # PostgreSQL connection
-    conn = connect_postgres()
-    cursor = conn.cursor()
-
-    postgres_query = "SELECT * FROM documents WHERE title ILIKE %s"
-    cursor.execute(postgres_query, (f"%{query}%",))
-    postgres_results = cursor.fetchall()
-
-    postgres_docs = [{"title": result[0], "content": result[1]} for result in postgres_results]
-    cursor.close()
-    conn.close()
-
-    # ElasticSearch connection
+    # جستجو در ElasticSearch
     es = connect_elasticsearch()
-    res = es.search(index="documents", body={"query": {"match": {"title": query}}})
+    res = es.search(index="tax", body={"query": {"match": {"title": query}}})
     es_docs = [hit["_source"] for hit in res['hits']['hits']]
 
-    # Redis connection
+    # کش کردن نتایج در Redis
     r = connect_redis()
-    redis_title = r.get(f'document:{query}:title')
-    redis_content = r.get(f'document:{query}:content')
-    redis_docs = []
-    if redis_title and redis_content:
-        redis_docs.append({"title": redis_title.decode('utf-8'), "content": redis_content.decode('utf-8')})
+    cache_key = f"search:{query}"
+    cached_results = r.get(cache_key)
 
-    # Classify documents using BERT
+    if cached_results:
+        return json.loads(cached_results)
+
+    # طبقه‌بندی متن با RoBERTa
     classified_docs = []
-    for doc in mongo_docs + postgres_docs + es_docs + redis_docs:
+    for doc in mongo_docs + es_docs:
         classification = classify_text(doc['content'])
         classified_docs.append({**doc, 'classification': classification})
+
+    # ذخیره نتایج در Redis
+    r.set(cache_key, json.dumps(classified_docs), ex=3600)
 
     return classified_docs
